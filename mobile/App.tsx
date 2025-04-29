@@ -7,36 +7,110 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   return (
     <View style={styles.wrapper}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>안전한 화재 대피를 위해</Text>
-        <Text style={styles.appName}>EZ-IT</Text>
-
-        {/* 🔻 아이콘 자리 (아직 기능 없음, 클릭해도 아무 동작 없음) */}
-        <View style={styles.iconRow}>
-          <TouchableOpacity style={styles.iconPlaceholder} />
-          <TouchableOpacity style={styles.iconPlaceholder} />
-          <TouchableOpacity style={styles.iconPlaceholder} />
-          <TouchableOpacity style={styles.iconPlaceholder} />
+        <View style={styles.headerLeft} />
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerText}>안전한 화재 대피를 위해</Text>
+          <Text style={styles.appName}>EZ-IT</Text>
         </View>
+        <TouchableOpacity style={styles.headerRight}>
+          <Feather name="settings" size={24} color="#333" />
+        </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.container}>
-        <Image
-          source={require("./assets/images/fire_guide_1.jpg")}
-          style={styles.guideImage}
-        />
-        <Image
-          source={require("./assets/images/fire_guide_2.jpg")}
-          style={styles.guideImage}
-        />
-        <Image
-          source={require("./assets/images/fire_guide_3.jpg")}
-          style={styles.guideImage}
-        />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.card}>
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: "800",
+              color: "#333",
+              marginBottom: 20,
+            }}
+          >
+            내 주변 안전 시설
+          </Text>
+          <View style={styles.iconRow}>
+            <TouchableOpacity style={styles.iconButton}>
+              <Feather
+                name="map"
+                size={40}
+                color="#555"
+                style={styles.iconImage}
+              />
+              <Text style={styles.iconLabel}>대피경로</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton}>
+              <Feather
+                name="alert-circle"
+                size={40}
+                color="#555"
+                style={styles.iconImage}
+              />
+              <Text style={styles.iconLabel}>화재정보</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton}>
+              <Feather
+                name="phone-call"
+                size={40}
+                color="#555"
+                style={styles.iconImage}
+              />
+              <Text style={styles.iconLabel}>비상연락망</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton}>
+              <Feather
+                name="home"
+                size={40}
+                color="#555"
+                style={styles.iconImage}
+              />
+              <Text style={styles.iconLabel}>임시주거시설</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: "800",
+              color: "#333",
+              marginBottom: 15,
+            }}
+          >
+            화재 대피 요령
+          </Text>
+          <View
+            style={{
+              ...styles.imageWrapper,
+              marginTop: -17,
+              marginBottom: -65,
+            }}
+          >
+            <Image
+              source={require("./assets/images/fire_guide_1.jpg")}
+              style={styles.guideImage}
+            />
+          </View>
+          <View style={{ ...styles.imageWrapper, marginBottom: -100 }}>
+            <Image
+              source={require("./assets/images/fire_guide_2.jpg")}
+              style={styles.guideImage}
+            />
+          </View>
+          <View style={{ ...styles.imageWrapper, marginBottom: -57 }}>
+            <Image
+              source={require("./assets/images/fire_guide_3.jpg")}
+              style={styles.guideImage}
+            />
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -45,46 +119,74 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f0f0f0",
   },
   header: {
-    paddingTop: 40,
+    paddingTop: 50,
+    paddingBottom: 12,
     backgroundColor: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+  headerLeft: {
+    width: 24,
+  },
+  headerCenter: {
+    flex: 1,
     alignItems: "center",
   },
+  headerRight: {
+    width: 24,
+    alignItems: "flex-end",
+  },
   headerText: {
-    paddingTop: 10,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "600",
     color: "#333",
   },
   appName: {
     fontSize: 26,
     fontWeight: "bold",
-    marginBottom: 12,
+    marginTop: 4,
+  },
+  scrollContent: {
+    padding: 16,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 3,
   },
   iconRow: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "100%",
-    paddingHorizontal: 20,
-    marginBottom: 12,
+    flexWrap: "wrap",
   },
-  iconPlaceholder: {
-    width: 50,
-    height: 50,
-    backgroundColor: "#e0f0e9",
-    borderRadius: 10,
-  },
-  container: {
-    paddingVertical: 20,
-    paddingHorizontal: 16,
+  iconButton: {
     alignItems: "center",
+    marginBottom: 10,
+  },
+  iconImage: {
+    marginBottom: 6,
+  },
+  iconLabel: {
+    fontSize: 13,
+    color: "#555",
+  },
+  imageWrapper: {
+    width: "100%",
+    marginBottom: 16,
   },
   guideImage: {
     width: "100%",
-    height: 400,
+    height: 500,
     resizeMode: "contain",
-    marginBottom: 20,
   },
 });
