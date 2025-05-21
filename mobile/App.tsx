@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,18 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Linking,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import EmergencyContactsModal from "./EmergencyContactsModal"; // 경로 맞게 수정
 
 export default function HomeScreen() {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openURL = (url: string) => {
+    Linking.openURL(url);
+  };
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.header}>
@@ -45,7 +53,14 @@ export default function HomeScreen() {
               />
               <Text style={styles.iconLabel}>대피경로</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() =>
+                openURL(
+                  "https://www.nfds.go.kr/bbs/selectBbsList.do?bbs=B14&pageNo=1"
+                )
+              }
+            >
               <Feather
                 name="alert-circle"
                 size={40}
@@ -54,7 +69,10 @@ export default function HomeScreen() {
               />
               <Text style={styles.iconLabel}>화재정보</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() => setModalVisible(true)}
+            >
               <Feather
                 name="phone-call"
                 size={40}
@@ -63,7 +81,14 @@ export default function HomeScreen() {
               />
               <Text style={styles.iconLabel}>비상연락망</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() =>
+                openURL(
+                  "https://www.sejong.go.kr/prog/shelter/T/depart/sub01_0810/list.do;jsessionid=8DE9B77F37F953B3C997F9B9E0ED750D.portal1"
+                )
+              }
+            >
               <Feather
                 name="home"
                 size={40}
@@ -81,37 +106,42 @@ export default function HomeScreen() {
               fontSize: 22,
               fontWeight: "800",
               color: "#333",
-              marginBottom: 15,
+              marginBottom: -38,
             }}
           >
             화재 대피 요령
           </Text>
-          <View
-            style={{
-              ...styles.imageWrapper,
-              marginTop: -17,
-              marginBottom: -65,
-            }}
-          >
-            <Image
-              source={require("./assets/images/fire_guide_1.jpg")}
-              style={styles.guideImage}
-            />
-          </View>
+
           <View style={{ ...styles.imageWrapper, marginBottom: -100 }}>
             <Image
               source={require("./assets/images/fire_guide_2.jpg")}
               style={styles.guideImage}
             />
           </View>
-          <View style={{ ...styles.imageWrapper, marginBottom: -57 }}>
+          <View style={{ ...styles.imageWrapper, marginBottom: -65 }}>
             <Image
               source={require("./assets/images/fire_guide_3.jpg")}
               style={styles.guideImage}
             />
           </View>
+          <Image
+            source={require("./assets/images/fire_guide_1.jpg")}
+            style={styles.guideImage}
+          />
+          <View
+            style={{
+              ...styles.imageWrapper,
+              marginTop: -17,
+              marginBottom: -5,
+            }}
+          ></View>
         </View>
       </ScrollView>
+
+      <EmergencyContactsModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 }

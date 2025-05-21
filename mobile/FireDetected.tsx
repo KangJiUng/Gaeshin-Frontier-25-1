@@ -39,7 +39,10 @@ export default function FireDetectedScreen() {
       </View>
 
       <View style={styles.mapContainer}>
-        <Image style={styles.mapImage} />
+        <Image
+          style={styles.mapImage}
+          source={{ uri: "https://via.placeholder.com/1x1.png" }}
+        />
       </View>
 
       <View style={styles.timerContainer}>
