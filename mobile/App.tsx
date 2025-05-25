@@ -159,6 +159,22 @@ export default function HomeScreen() {
           <Feather name="alert-triangle" size={28} color="#fff" />
         </TouchableOpacity>
       )}
+
+      {/* 화재대피화면 테스트용 코드 */}
+      {__DEV__ && (
+        <TouchableOpacity
+          style={[
+            styles.floatingButton,
+            { bottom: 100, backgroundColor: "#555" },
+          ]}
+          onPress={() => {
+            navigation.navigate("FireDetected");
+            useEvacuationStore.getState().setState("detected");
+          }}
+        >
+          <Feather name="tool" size={28} color="#fff" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
