@@ -9,10 +9,18 @@ import {
   Linking,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import EmergencyContactsModal from "./EmergencyContactsModal"; // 경로 맞게 수정
+import EmergencyContactsModal from "./EmergencyContactsModal";
+import { useEvacuationStore } from "./useEvacuationStore";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "./index";
 
 export default function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const { state } = useEvacuationStore();
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const openURL = (url: string) => {
     Linking.openURL(url);
@@ -85,7 +93,7 @@ export default function HomeScreen() {
               style={styles.iconButton}
               onPress={() =>
                 openURL(
-                  "https://www.sejong.go.kr/prog/shelter/T/depart/sub01_0810/list.do;jsessionid=8DE9B77F37F953B3C997F9B9E0ED750D.portal1"
+                  "https://www.sejong.go.kr/prog/shelter/T/depart/sub01_0810/list.do"
                 )
               }
             >
@@ -142,6 +150,15 @@ export default function HomeScreen() {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
+
+      {state === "detected" && (
+        <TouchableOpacity
+          style={styles.floatingButton}
+          onPress={() => navigation.navigate("FireDetected")}
+        >
+          <Feather name="alert-triangle" size={28} color="#fff" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -218,5 +235,14 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 500,
     resizeMode: "contain",
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 30,
+    right: 20,
+    backgroundColor: "red",
+    borderRadius: 50,
+    padding: 16,
+    elevation: 5,
   },
 });

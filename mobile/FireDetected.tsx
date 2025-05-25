@@ -10,12 +10,16 @@ import {
 import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useEvacuationStore } from "./useEvacuationStore";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "./index";
 
 export default function FireDetectedScreen() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [address, setAddress] = useState<string | null>(null);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
-  const [evacuationCompleted, setEvacuationCompleted] = useState(false);
-  const navigation = useNavigation();
+  const setState = useEvacuationStore((s) => s.setState);
 
   useEffect(() => {
     (async () => {
@@ -45,17 +49,10 @@ export default function FireDetectedScreen() {
     return () => clearInterval(interval);
   }, []);
 
+  const hours = Math.floor(secondsElapsed / 3600);
+  const minutes = Math.floor((secondsElapsed % 3600) / 60);
+  const seconds = secondsElapsed % 60;
   const pad = (num: number) => num.toString().padStart(2, "0");
-
-  const handleGoHome = () => {
-    // 대피 완료 여부 상관 없이 홈으로 이동
-    navigation.navigate("App");
-  };
-
-  const handleEvacuationComplete = () => {
-    setEvacuationCompleted(true);
-    navigation.navigate("Fire");
-  };
 
   return (
     <ScrollView
@@ -66,7 +63,7 @@ export default function FireDetectedScreen() {
         <Text style={styles.title}>나의 위치</Text>
         <Text style={styles.location}>{address || "위치 불러오는 중..."}</Text>
         <Text style={styles.subtext}>
-          가까운 곳에서 <Text style={styles.highlight}>화재가 발생</Text>{" "}
+          가까운 곳에서 <Text style={styles.highlight}>화재가 발생</Text>
           하였습니다.{"\n"}
           아래의 안내도에 따라 신속히 이동해주세요.
         </Text>
@@ -82,27 +79,30 @@ export default function FireDetectedScreen() {
       <View style={styles.timerContainer}>
         <Text style={styles.fireText}>화재가 감지된 지</Text>
         <Text style={styles.timerText}>
-          {pad(Math.floor(secondsElapsed / 3600))}H{" "}
-          {pad(Math.floor((secondsElapsed % 3600) / 60))}M{" "}
-          {pad(secondsElapsed % 60)}S
+          {pad(hours)}H {pad(minutes)}M {pad(seconds)}S
         </Text>
       </View>
-
-      <View style={{ padding: 10 }}></View>
+      <View style={{ padding: 10 }} />
 
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <TouchableOpacity style={styles.homeContainer} onPress={handleGoHome}>
+        <TouchableOpacity
+          style={styles.homeContainer}
+          onPress={() => navigation.navigate("Home")}
+        >
           <View style={styles.iconWrapper}>
             <Feather name="home" size={80} color="rgba(0,0,0,0.1)" />
           </View>
           <View style={styles.textWrapper}>
-            <Text style={{ ...styles.buttonText }}>홈으로</Text>
+            <Text style={styles.buttonText}>홈으로</Text>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.homeContainer}
-          onPress={handleEvacuationComplete}
+          onPress={() => {
+            setState("completed");
+            navigation.navigate("Home");
+          }}
         >
           <View style={styles.iconWrapper}>
             <Feather name="check-circle" size={80} color="rgba(0,128,0,0.1)" />
@@ -115,17 +115,7 @@ export default function FireDetectedScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* 대피 완료 전일 때만 오른쪽 하단에 화재발생 페이지 복귀 버튼 노출 */}
-      {!evacuationCompleted && (
-        <TouchableOpacity
-          style={styles.backToFireDetectedButton}
-          onPress={() => navigation.navigate("FireDetected")}
-        >
-          <Text style={styles.backButtonText}>화재발생 페이지로 돌아가기</Text>
-        </TouchableOpacity>
-      )}
-
-      <View style={{ padding: 15 }}></View>
+      <View style={{ padding: 15 }} />
     </ScrollView>
   );
 }
@@ -212,19 +202,5 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#333",
-  },
-  backToFireDetectedButton: {
-    position: "absolute",
-    bottom: 30,
-    right: 30,
-    backgroundColor: "#f44336",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    elevation: 5,
-  },
-  backButtonText: {
-    color: "#fff",
-    fontWeight: "600",
   },
 });
