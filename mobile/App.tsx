@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Linking,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import EmergencyContactsModal from "./EmergencyContactsModal";
 import { useEvacuationStore } from "./useEvacuationStore";
 import { useNavigation } from "@react-navigation/native";
@@ -156,23 +156,12 @@ export default function HomeScreen() {
           style={styles.floatingButton}
           onPress={() => navigation.navigate("FireDetected")}
         >
-          <Feather name="alert-triangle" size={28} color="#fff" />
-        </TouchableOpacity>
-      )}
-
-      {/* 화재대피화면 테스트용 코드 */}
-      {__DEV__ && (
-        <TouchableOpacity
-          style={[
-            styles.floatingButton,
-            { bottom: 100, backgroundColor: "#555" },
-          ]}
-          onPress={() => {
-            navigation.navigate("FireDetected");
-            useEvacuationStore.getState().setState("detected");
-          }}
-        >
-          <Feather name="tool" size={28} color="#fff" />
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <MaterialCommunityIcons name="exit-run" size={28} color="#fff" />
+            <Text style={[styles.buttonText, { marginLeft: 10 }]}>
+              대피화면으로
+            </Text>
+          </View>
         </TouchableOpacity>
       )}
     </View>
@@ -255,10 +244,19 @@ const styles = StyleSheet.create({
   floatingButton: {
     position: "absolute",
     bottom: 30,
-    right: 20,
-    backgroundColor: "red",
+    left: 25,
+    right: 25,
+    backgroundColor: "#009900",
     borderRadius: 50,
     padding: 16,
     elevation: 5,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  buttonText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
   },
 });

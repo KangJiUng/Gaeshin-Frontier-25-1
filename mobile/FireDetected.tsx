@@ -10,16 +10,21 @@ import {
 import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { useEvacuationStore } from "./useEvacuationStore";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./index";
+import { useEvacuationStore } from "./useEvacuationStore"; // ✅ zustand 훅 가져오기
 
 export default function FireDetectedScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const { state, setState, secondsElapsed, startTimer } = useEvacuationStore();
+
   const [address, setAddress] = useState<string | null>(null);
-  const [secondsElapsed, setSecondsElapsed] = useState(0);
-  const setState = useEvacuationStore((s) => s.setState);
+
+  useEffect(() => {
+    startTimer(); // ✅ 컴포넌트 마운트 시 타이머 시작
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -42,16 +47,10 @@ export default function FireDetectedScreen() {
     })();
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSecondsElapsed((prev) => prev + 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   const hours = Math.floor(secondsElapsed / 3600);
   const minutes = Math.floor((secondsElapsed % 3600) / 60);
   const seconds = secondsElapsed % 60;
+
   const pad = (num: number) => num.toString().padStart(2, "0");
 
   return (
@@ -85,6 +84,7 @@ export default function FireDetectedScreen() {
       <View style={{ padding: 10 }} />
 
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        {/* 홈으로 */}
         <TouchableOpacity
           style={styles.homeContainer}
           onPress={() => navigation.navigate("Home")}
@@ -97,10 +97,11 @@ export default function FireDetectedScreen() {
           </View>
         </TouchableOpacity>
 
+        {/* 대피 완료 */}
         <TouchableOpacity
           style={styles.homeContainer}
           onPress={() => {
-            setState("completed");
+            setState("completed"); // ✅ 상태 바꾸면 자동으로 타이머 리셋
             navigation.navigate("Home");
           }}
         >
