@@ -6,13 +6,14 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./index";
-import { useEvacuationStore } from "./useEvacuationStore"; // ✅ zustand 훅 가져오기
+import { useEvacuationStore } from "./useEvacuationStore";
 
 export default function FireDetectedScreen() {
   const navigation =
@@ -23,7 +24,7 @@ export default function FireDetectedScreen() {
   const [address, setAddress] = useState<string | null>(null);
 
   useEffect(() => {
-    startTimer(); // ✅ 컴포넌트 마운트 시 타이머 시작
+    startTimer();
   }, []);
 
   useEffect(() => {
@@ -84,7 +85,6 @@ export default function FireDetectedScreen() {
       <View style={{ padding: 10 }} />
 
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        {/* 홈으로 */}
         <TouchableOpacity
           style={styles.homeContainer}
           onPress={() => navigation.navigate("Home")}
@@ -97,12 +97,31 @@ export default function FireDetectedScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* 대피 완료 */}
         <TouchableOpacity
           style={styles.homeContainer}
           onPress={() => {
-            setState("completed"); // ✅ 상태 바꾸면 자동으로 타이머 리셋
-            navigation.navigate("Home");
+            Alert.alert(
+              "안전하게 대피하셨나요?",
+              "",
+              [
+                {
+                  text: "예",
+                  onPress: () => {
+                    setState("idle");
+                    navigation.navigate("Home");
+                  },
+                },
+                {
+                  text: "아니오",
+                  onPress: () => {
+                    setState("detected");
+                    navigation.navigate("FireDetected");
+                  },
+                  style: "destructive",
+                },
+              ],
+              { cancelable: false }
+            );
           }}
         >
           <View style={styles.iconWrapper}>

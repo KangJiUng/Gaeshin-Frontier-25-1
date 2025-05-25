@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type EvacuationState = "idle" | "detected" | "completed";
+type EvacuationState = "idle" | "detected";
 
 interface EvacuationStore {
   state: EvacuationState;
@@ -20,8 +20,7 @@ export const useEvacuationStore = create<EvacuationStore>((set, get) => ({
   setState: (newState) => {
     set({ state: newState });
 
-    // 상태가 completed일 경우 타이머 초기화
-    if (newState === "completed") {
+    if (newState === "idle") {
       get().resetTimer();
     }
   },
@@ -29,7 +28,7 @@ export const useEvacuationStore = create<EvacuationStore>((set, get) => ({
   secondsElapsed: 0,
 
   startTimer: () => {
-    if (timerId) return; // 이미 실행 중이면 무시
+    if (timerId) return;
     timerId = setInterval(() => {
       set((state) => ({ secondsElapsed: state.secondsElapsed + 1 }));
     }, 1000);
