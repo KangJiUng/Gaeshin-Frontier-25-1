@@ -21,81 +21,96 @@ export default function FireDetectedScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const { state, setState, secondsElapsed, startTimer } = useEvacuationStore();
+  const {
+    state,
+    setState,
+    secondsElapsed,
+    startTimer,
+    dotTop: storedTop,
+    dotLeft: storedLeft,
+    setDotPosition,
+    animationStep,
+    setAnimationStep,
+  } = useEvacuationStore();
 
   const [address, setAddress] = useState<string | null>(null);
   const [imageSource, setImageSource] = useState(
     require("./assets/images/exit1.png")
   );
   const [showAlertText, setShowAlertText] = useState(false);
-
-  const dotTop = useRef(new Animated.Value(245)).current;
-  const dotLeft = useRef(new Animated.Value(138)).current;
-  const blinkAnim = useRef(new Animated.Value(1)).current;
   const [showDangerImage, setShowDangerImage] = useState(false);
+
+  const dotTop = useRef(new Animated.Value(storedTop)).current;
+  const dotLeft = useRef(new Animated.Value(storedLeft)).current;
+  const blinkAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     startTimer();
   }, []);
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.timing(dotTop, {
-        toValue: 220,
-        duration: 1000,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: false,
-      }),
-      Animated.timing(dotLeft, {
-        toValue: 210,
-        duration: 3500,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: false,
-      }),
-    ]).start(({ finished }) => {
-      if (finished) {
-        setImageSource(require("./assets/images/exit2.png"));
-        setShowAlertText(true);
-        setShowDangerImage(true);
+    if (animationStep === 0) {
+      Animated.sequence([
+        Animated.timing(dotTop, {
+          toValue: 220,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(dotLeft, {
+          toValue: 210,
+          duration: 3500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+      ]).start(({ finished }) => {
+        if (finished) {
+          setImageSource(require("./assets/images/exit2.png"));
+          setShowAlertText(true);
+          setShowDangerImage(true);
+          setAnimationStep(1);
 
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(blinkAnim, {
-              toValue: 0,
-              duration: 500,
-              useNativeDriver: true,
-            }),
-            Animated.timing(blinkAnim, {
-              toValue: 1,
-              duration: 500,
-              useNativeDriver: true,
-            }),
-          ])
-        ).start();
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(blinkAnim, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+              }),
+              Animated.timing(blinkAnim, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+              }),
+            ])
+          ).start();
+        }
+      });
+    }
 
-        Animated.sequence([
-          Animated.timing(dotLeft, {
-            toValue: 285,
-            duration: 3000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: false,
-          }),
-          Animated.timing(dotTop, {
-            toValue: 80,
-            duration: 4500,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: false,
-          }),
-          Animated.timing(dotLeft, {
-            toValue: 320,
-            duration: 1000,
-            easing: Easing.inOut(Easing.ease),
-            useNativeDriver: false,
-          }),
-        ]).start();
-      }
-    });
-  }, []);
+    if (animationStep === 1) {
+      Animated.sequence([
+        Animated.timing(dotLeft, {
+          toValue: 285,
+          duration: 3000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(dotTop, {
+          toValue: 80,
+          duration: 4500,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(dotLeft, {
+          toValue: 320,
+          duration: 1000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+      ]).start(() => setAnimationStep(2));
+    }
+  }, [animationStep]);
 
   useEffect(() => {
     (async () => {
@@ -118,11 +133,10 @@ export default function FireDetectedScreen() {
     })();
   }, []);
 
+  const pad = (num: number) => num.toString().padStart(2, "0");
   const hours = Math.floor(secondsElapsed / 3600);
   const minutes = Math.floor((secondsElapsed % 3600) / 60);
   const seconds = secondsElapsed % 60;
-
-  const pad = (num: number) => num.toString().padStart(2, "0");
 
   return (
     <ScrollView
@@ -171,12 +185,20 @@ export default function FireDetectedScreen() {
           {pad(hours)}H {pad(minutes)}M {pad(seconds)}S
         </Text>
       </View>
+
       <View style={{ padding: 10 }} />
 
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <TouchableOpacity
           style={styles.homeContainer}
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => {
+            dotTop.stopAnimation((topVal) => {
+              dotLeft.stopAnimation((leftVal) => {
+                setDotPosition(topVal, leftVal);
+                navigation.navigate("Home");
+              });
+            });
+          }}
         >
           <View style={styles.iconWrapper}>
             <Feather name="home" size={80} color="rgba(0,0,0,0.1)" />
@@ -197,6 +219,7 @@ export default function FireDetectedScreen() {
                   text: "예",
                   onPress: () => {
                     setState("idle");
+                    setAnimationStep(0);
                     navigation.navigate("Home");
                   },
                 },
@@ -204,6 +227,7 @@ export default function FireDetectedScreen() {
                   text: "아니오",
                   onPress: () => {
                     setState("detected");
+                    setAnimationStep(0);
                     navigation.navigate("FireDetected");
                   },
                   style: "destructive",
@@ -230,36 +254,17 @@ export default function FireDetectedScreen() {
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flexGrow: 1,
-    backgroundColor: "#f0f0f0",
-    padding: 16,
-  },
-  header: {
-    marginBottom: 20,
-    marginTop: 60,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 4,
-  },
-  location: {
-    fontSize: 36,
-    fontWeight: "600",
-    marginBottom: 10,
-  },
+  wrapper: { flexGrow: 1, backgroundColor: "#f0f0f0", padding: 16 },
+  header: { marginBottom: 20, marginTop: 60 },
+  title: { fontSize: 30, fontWeight: "bold", color: "#333", marginBottom: 4 },
+  location: { fontSize: 36, fontWeight: "600", marginBottom: 10 },
   subtext: {
     fontSize: 18,
     color: "#555",
     lineHeight: 22,
     marginBottom: 8,
   },
-  highlight: {
-    color: "red",
-    fontWeight: "bold",
-  },
+  highlight: { color: "red", fontWeight: "bold" },
   mapContainer: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -286,11 +291,7 @@ const styles = StyleSheet.create({
     height: 30,
     zIndex: 3,
   },
-  mapImage: {
-    width: 350,
-    height: 300,
-    resizeMode: "contain",
-  },
+  mapImage: { width: 350, height: 300, resizeMode: "contain" },
   redDot: {
     position: "absolute",
     width: 14,
@@ -310,11 +311,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontWeight: "600",
   },
-  timerText: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#333",
-  },
+  timerText: { fontSize: 32, fontWeight: "bold", color: "#333" },
   homeContainer: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -331,12 +328,6 @@ const styles = StyleSheet.create({
     height: 80,
     zIndex: 0,
   },
-  textWrapper: {
-    zIndex: 1,
-  },
-  buttonText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-  },
+  textWrapper: { zIndex: 1 },
+  buttonText: { fontSize: 24, fontWeight: "bold", color: "#333" },
 });
