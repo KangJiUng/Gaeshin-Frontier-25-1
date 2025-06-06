@@ -17,7 +17,7 @@ import {
 const contacts = [
   {
     label: "소방서",
-    url: "https://safekorea.go.kr/idsiSFK/neo/sfk/cs/ppn/tel/firsUserList.html?menuSeq=144",
+    url: "https://m.safekorea.go.kr/idsiSFK/neo/main_m/res/firehouseList.html",
     iconSet: FontAwesome5,
     iconName: "fire-extinguisher",
   },
@@ -29,19 +29,19 @@ const contacts = [
   },
   {
     label: "일반병원",
-    url: "https://safekorea.go.kr/idsiSFK/neo/sfk/cs/ppn/tel/medicalUserList.html?menuSeq=148",
+    url: "https://m.safekorea.go.kr/idsiSFK/neo/main_m/res/hospitalList.html",
     iconSet: FontAwesome5,
     iconName: "hospital-alt",
   },
   {
     label: "약국",
-    url: "https://safekorea.go.kr/idsiSFK/neo/sfk/cs/ppn/tel/drugstoreUserList.html?menuSeq=150",
+    url: "https://m.safekorea.go.kr/idsiSFK/neo/main_m/res/pharmacyList.html",
     iconSet: MaterialCommunityIcons,
     iconName: "pill",
   },
   {
     label: "혈액원",
-    url: "https://safekorea.go.kr/idsiSFK/neo/sfk/cs/ppn/tel/bloodUserList.html?menuSeq=151",
+    url: "https://m.safekorea.go.kr/idsiSFK/neo/main_m/res/bloodList.html",
     iconSet: Feather,
     iconName: "droplet",
   },

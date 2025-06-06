@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Animated,
+  Easing,
 } from "react-native";
 import * as Location from "expo-location";
 import { Feather } from "@expo/vector-icons";
@@ -22,9 +24,77 @@ export default function FireDetectedScreen() {
   const { state, setState, secondsElapsed, startTimer } = useEvacuationStore();
 
   const [address, setAddress] = useState<string | null>(null);
+  const [imageSource, setImageSource] = useState(
+    require("./assets/images/exit1.png")
+  );
+  const [showAlertText, setShowAlertText] = useState(false);
+
+  const dotTop = useRef(new Animated.Value(245)).current;
+  const dotLeft = useRef(new Animated.Value(138)).current;
+  const blinkAnim = useRef(new Animated.Value(1)).current;
+  const [showDangerImage, setShowDangerImage] = useState(false);
 
   useEffect(() => {
     startTimer();
+  }, []);
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(dotTop, {
+        toValue: 220,
+        duration: 1000,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: false,
+      }),
+      Animated.timing(dotLeft, {
+        toValue: 210,
+        duration: 3500,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: false,
+      }),
+    ]).start(({ finished }) => {
+      if (finished) {
+        setImageSource(require("./assets/images/exit2.png"));
+        setShowAlertText(true);
+        setShowDangerImage(true);
+
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(blinkAnim, {
+              toValue: 0,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+            Animated.timing(blinkAnim, {
+              toValue: 1,
+              duration: 500,
+              useNativeDriver: true,
+            }),
+          ])
+        ).start();
+
+        Animated.sequence([
+          Animated.timing(dotLeft, {
+            toValue: 285,
+            duration: 3000,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: false,
+          }),
+          Animated.timing(dotTop, {
+            toValue: 80,
+            duration: 4500,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: false,
+          }),
+          Animated.timing(dotLeft, {
+            toValue: 320,
+            duration: 1000,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: false,
+          }),
+        ]).start();
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -70,9 +140,28 @@ export default function FireDetectedScreen() {
       </View>
 
       <View style={styles.mapContainer}>
-        <Image
-          style={styles.mapImage}
-          source={{ uri: "https://via.placeholder.com/1x1.png" }}
+        {showAlertText && (
+          <Animated.Text
+            style={[styles.alertOverlayText, { opacity: blinkAnim }]}
+          >
+            대피 경로가 변경되었습니다!
+          </Animated.Text>
+        )}
+        <Image style={styles.mapImage} source={imageSource} />
+        {showDangerImage && (
+          <Image
+            source={require("./assets/images/danger.png")}
+            style={[styles.dangerIcon, { top: 210, left: 310 }]}
+          />
+        )}
+        <Animated.View
+          style={[
+            styles.redDot,
+            {
+              top: dotTop,
+              left: dotLeft,
+            },
+          ]}
         />
       </View>
 
@@ -165,6 +254,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#555",
     lineHeight: 22,
+    marginBottom: 8,
   },
   highlight: {
     color: "red",
@@ -173,14 +263,40 @@ const styles = StyleSheet.create({
   mapContainer: {
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: 65,
+    padding: 20,
     marginBottom: 20,
     alignItems: "center",
+    position: "relative",
+  },
+  alertOverlayText: {
+    position: "absolute",
+    top: 10,
+    left: 0,
+    right: 0,
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "red",
+    zIndex: 2,
+  },
+  dangerIcon: {
+    position: "absolute",
+    resizeMode: "contain",
+    width: 30,
+    height: 30,
+    zIndex: 3,
   },
   mapImage: {
-    width: "100%",
+    width: 350,
     height: 300,
     resizeMode: "contain",
+  },
+  redDot: {
+    position: "absolute",
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: "red",
   },
   timerContainer: {
     backgroundColor: "#fff",

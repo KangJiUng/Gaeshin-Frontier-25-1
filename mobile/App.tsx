@@ -52,14 +52,21 @@ export default function HomeScreen() {
             내 주변 안전 시설
           </Text>
           <View style={styles.iconRow}>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={() =>
+                openURL(
+                  "https://m.safekorea.go.kr/idsiSFK/neo/main_m/res/evacuateList.html"
+                )
+              }
+            >
               <Feather
                 name="map"
                 size={40}
                 color="#555"
                 style={styles.iconImage}
               />
-              <Text style={styles.iconLabel}>대피경로</Text>
+              <Text style={styles.iconLabel}>대피소</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.iconButton}
@@ -162,6 +169,22 @@ export default function HomeScreen() {
               대피화면으로
             </Text>
           </View>
+        </TouchableOpacity>
+      )}
+
+      {/* 화재대피화면 테스트용 코드 */}
+      {__DEV__ && (
+        <TouchableOpacity
+          style={[
+            styles.floatingButton,
+            { bottom: 100, backgroundColor: "#555" },
+          ]}
+          onPress={() => {
+            navigation.navigate("FireDetected");
+            useEvacuationStore.getState().setState("detected");
+          }}
+        >
+          <Feather name="tool" size={28} color="#fff" />
         </TouchableOpacity>
       )}
     </View>
